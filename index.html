@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemePage - Create Your Meme Coin Landing Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <header class="header">
+        <h1>MemePage</h1>
+        <p>Create a stunning landing page for your meme coin in minutes.</p>
+    </header>
+    <main>
+        <section class="form-section">
+            <h2>Fill in Your Meme Coin Details</h2>
+            <form id="memeForm">
+                <label for="tokenName">Token Name:</label>
+                <input type="text" id="tokenName" name="tokenName" placeholder="e.g., DogeInu" required>
+
+                <label for="ticker">Ticker:</label>
+                <input type="text" id="ticker" name="ticker" placeholder="e.g., DOGE" required>
+
+                <label for="twitter">Twitter URL:</label>
+                <input type="url" id="twitter" name="twitter" placeholder="e.g., https://twitter.com/doge">
+
+                <label for="telegram">Telegram URL:</label>
+                <input type="url" id="telegram" name="telegram" placeholder="e.g., https://t.me/dogeInu">
+
+                <label for="website">Website URL:</label>
+                <input type="url" id="website" name="website" placeholder="e.g., https://dogeinu.com">
+
+                <label for="background">Background (Color or Image URL):</label>
+                <input type="text" id="background" name="background" placeholder="e.g., #f0f0f0 or https://example.com/bg.jpg">
+
+                <label for="logo">Upload Logo:</label>
+                <input type="file" id="logo" name="logo" accept="image/*">
+
+                <button type="button" id="generateBtn">Generate Page</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>Powered by MemePage</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
