@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <style>
+          body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+            text-align: center;
+          }
+          h1 {
+              color: #4CAF50;
+              margin-bottom: 20px;
+          }
+          p {
+              font-size: 1.1em;
+          }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+             const params = new URLSearchParams(window.location.search);
+             const targetPage = params.get('target');
+              if (targetPage) {
+                   setTimeout(() => {
+                      window.location.href = targetPage;
+                  }, 2000); // Redirect after 2 seconds
+              } else {
+               // Handle the case where target is not provided
+                 console.error("Target URL not provided in query parameters.");
+                  document.body.innerHTML = `<h1>Error!</h1><p>Redirect URL not found.</p>`
+             }
+         });
+    </script>
+</head>
+<body>
+    <h1>Thank You for Your Support!</h1>
+    <p>Redirecting you to your generated page...</p>
+</body>
+</html>
