@@ -21,7 +21,7 @@ const BASE_URL = window.location.origin + window.location.pathname.substring(0, 
 
 const generateBtn = document.getElementById("generateBtn");
 const buyMeACoffeeProductID = '364445'; // Replace with the actual product ID
-const geminiAPIKey = 'YOUR_GEMINI_API_KEY';  //Replace with your Gemini API key
+const geminiAPIKey = 'AIzaSyArUInov5_tbl5dudWfnAvPoswDHxH7gws';  //Replace with your Gemini API key
 
 // Function to show the modal with redirect button
 function showUpgradeModal(redirectURL, shortURL) {
