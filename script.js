@@ -158,8 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // ********** AI FUNCTION **************
 async function generateLandingPageHTML(formData) {
   // Replace with your actual AI API endpoint and API key
-  const AI_API_ENDPOINT = "YOUR_AI_API_ENDPOINT";
-  const AI_API_KEY = "YOUR_AI_API_KEY";
+  const AI_API_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
+  const AI_API_KEY = "iIHsqE5hWVgdiTcUHuy4QWjBOkCblRc0";
 
   try {
       const response = await fetch(AI_API_ENDPOINT, {
