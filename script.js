@@ -36,7 +36,7 @@ function showUpgradeModal(redirectURL, shortURL) {
 
 }
 
-const mistralApiKey = 'YOUR_MISTRAL_API_KEY'; // Replace with your actual Mistral API key
+const mistralApiKey = 'iIHsqE5hWVgdiTcUHuy4QWjBOkCblRc0'; // Replace with your actual Mistral API key
 
 async function generateLandingPageContent(formData) {
     const prompt = `Generate HTML content for a meme coin landing page with the following details:\n\n
