@@ -1,5 +1,3 @@
---- START OF FILE render.js ---
-
 // Replace with your actual Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyC7aI4WnfBagNk_PBg9LA49s79WzMQ7N8g",
