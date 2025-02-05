@@ -12,8 +12,6 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const storage = firebase.storage();
-
 
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dn5qjgaio/image/upload';
 const CLOUDINARY_UPLOAD_PRESET = 'memepage-generator';
@@ -21,7 +19,6 @@ const BASE_URL = window.location.origin + window.location.pathname.substring(0, 
 
 const generateBtn = document.getElementById("generateBtn");
 const buyMeACoffeeProductID = '364445'; // Replace with the actual product ID
-const geminiAPIKey = 'AIzaSyArUInov5_tbl5dudWfnAvPoswDHxH7gws';  //Replace with your Gemini API key
 
 // Function to show the modal with redirect button
 function showUpgradeModal(redirectURL, shortURL) {
@@ -83,47 +80,43 @@ generateBtn.addEventListener("click", async () => {
             return;
         }
     }
-    
-    const formData = {
-        tokenName,
-        ticker,
-        twitter,
-        telegram,
-        website,
-        background,
-        logo: logoURL
-    };
-     try {
-         const generatedHTML = await generateLandingPageHTML(formData);
-          if(!generatedHTML)
-          {
-              alert("Failed to generate landing page.");
-             generateBtn.disabled = false;
-             generateBtn.classList.remove("loading");
-             generateBtn.innerHTML = "Generate Page";
-             return;
 
-          }
-           const docRef = await db.collection("memePages").add(formData);
-           const shortId = docRef.id;
-           const shortURL = `${BASE_URL}generated.html#${shortId}`;
+      const formData = {
+          tokenName,
+          ticker,
+          twitter,
+          telegram,
+          website,
+          background,
+          logo: logoURL
+      }
 
-           // Save the generated HTML to Firebase Storage
-           await saveHTMLToStorage(generatedHTML, shortId);
-            // Remove loading state
-           generateBtn.disabled = false;
-           generateBtn.classList.remove("loading");
-           generateBtn.innerHTML = "Generate Page";
+    try {
+        // *** AI INTEGRATION STARTS HERE ***
+        const generatedHTML = await generateLandingPageHTML(formData);
 
-          //show the redirect modal
-           showUpgradeModal(shortId, shortURL);
+        if (!generatedHTML) {
+            throw new Error("Failed to generate landing page HTML from AI.");
+        }
 
-     } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to generate page. Please try again.");
-         generateBtn.disabled = false;
+        const docRef = await db.collection("memePages").add({ html: generatedHTML }); // Store the complete HTML
+        const shortId = docRef.id;
+        const shortURL = `${BASE_URL}generated.html#${shortId}`;
+
+        // Remove loading state
+        generateBtn.disabled = false; // enable the generate button
         generateBtn.classList.remove("loading");
-         generateBtn.innerHTML = "Generate Page";
+        generateBtn.innerHTML = "Generate Page";
+
+        //show the redirect modal
+        showUpgradeModal(shortId, shortURL);
+
+    } catch (error) {
+        console.error("Error generating page:", error);
+        alert("Failed to generate page. Please try again later.");
+        generateBtn.disabled = false;
+        generateBtn.classList.remove("loading");
+        generateBtn.innerHTML = "Generate Page";
     }
 });
 
@@ -162,177 +155,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// --- Gemini Functionality ---
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
+// ********** AI FUNCTION **************
 async function generateLandingPageHTML(formData) {
-  const genAI = new GoogleGenerativeAI(geminiAPIKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+  // Replace with your actual AI API endpoint and API key
+  const AI_API_ENDPOINT = "YOUR_AI_API_ENDPOINT";
+  const AI_API_KEY = "YOUR_AI_API_KEY";
 
-  const prompt = `
-        Generate a modern, beautiful, high-quality HTML landing page for a meme coin based on the following data. Use Tailwind CSS for styling and ensure the page is responsive.
-        The landing page should have a hero section, a features section, a tokenomics section, and a how-to-buy section.
-        Make use of a countdown timer on the header
-        Ensure the page contains appropriate image tags.
-        Here's the meme coin data:
-        Token Name: ${formData.tokenName}
-        Ticker: ${formData.ticker}
-        Twitter: ${formData.twitter}
-        Telegram: ${formData.telegram}
-        Website: ${formData.website}
-        Background: ${formData.background}
-        Logo URL: ${formData.logo || 'default-logo.png'}
-
-        Here is an example html page:
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>DogeInu - The Next Big Meme Coin</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-                .hero-bg { background: linear-gradient(45deg, #667eea, #764ba2); }
-                .coin-symbol { text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-                @keyframes bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-20px); }
-                }
-                .bouncing { animation: bounce 2s infinite; }
-            </style>
-        </head>
-        <body class="bg-gray-100">
-            <!-- Hero Section -->
-            <header class="hero-bg text-white py-20 px-4">
-                <div class="container mx-auto text-center">
-                    <img src="https://abc.com" alt="DogeInu Logo"
-                         class="bouncing h-32 w-32 mx-auto mb-6 rounded-full border-4 border-white shadow-lg">
-                    <h1 class="text-5xl font-bold mb-4 coin-symbol">DOGE</h1>
-                    <p class="text-xl mb-8">Decentralized network
-    Low network fees
-    High volatility </p>
-                    <div class="flex justify-center space-x-4 mb-8">
-                        <a href="#buy" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-semibold hover:bg-opacity-90 transition">
-                            Buy Now 🚀
-                        </a>
-                        <a href="#whitepaper" class="border-2 border-white px-8 py-3 rounded-full hover:bg-white hover:text-indigo-600 transition">
-                            Whitepaper 📄
-                        </a>
-                    </div>
-                    <div id="countdown" class="text-2xl font-mono"></div>
-                </div>
-            </header>
-
-            <!-- Features Section -->
-            <section class="py-16 bg-white">
-                <div class="container mx-auto px-4 grid md:grid-cols-3 gap-8">
-                    <div class="text-center p-6 hover:bg-gray-50 rounded-lg transition">
-                        <div class="text-4xl mb-4">🔥</div>
-                        <h3 class="text-xl font-bold mb-2">Deflationary Mechanism</h3>
-                        <p>Automatic burns with every transaction</p>
-                    </div>
-                    <div class="text-center p-6 hover:bg-gray-50 rounded-lg transition">
-                        <div class="text-4xl mb-4">🛡️</div>
-                        <h3 class="text-xl font-bold mb-2">100% Safe</h3>
-                        <p>Liquidity locked for 1 year</p>
-                    </div>
-                    <div class="text-center p-6 hover:bg-gray-50 rounded-lg transition">
-                        <div class="text-4xl mb-4">🌐</div>
-                        <h3 class="text-xl font-bold mb-2">Community Driven</h3>
-                        <p>Fully decentralized governance</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Tokenomics Section -->
-            <section class="py-16 bg-gray-50">
-                <div class="container mx-auto px-4">
-                    <h2 class="text-3xl font-bold text-center mb-8">Tokenomics 💰</h2>
-                    <div class="max-w-2xl mx-auto bg-white rounded-xl p-6 shadow-md">
-                        <div class="flex justify-between mb-4">
-                            <span>Total Supply:</span>
-                            <span class="font-semibold">1000000000 DOGE</span>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between">
-                                <span>Presale</span>
-                                <span>40%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Liquidity</span>
-                                <span>30%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Marketing</span>
-                                <span>20%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Team</span>
-                                <span>10%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- How to Buy Section -->
-            <section class="py-16 bg-white" id="buy">
-                <div class="container mx-auto px-4">
-                    <h2 class="text-3xl font-bold text-center mb-8">How to Buy 📈</h2>
-                    <div class="max-w-3xl mx-auto space-y-6">
-                        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
-                            <div class="text-2xl mr-4">1</div>
-                            <div>
-                                <h3 class="font-bold mb-2">Create Wallet</h3>
-                                <p>Download MetaMask or Trust Wallet</p>
-                            </div>
-                        </div>
-                        <!-- Add more steps here -->
-                    </div>
-                </div>
-            </section>
-
-            <script>
-                // Countdown Timer
-                const countDownDate = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
-                const timer = setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = countDownDate - now;
-
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    document.getElementById('countdown').innerHTML = `⏳ Launch in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-                    if (distance < 0) {
-                        clearInterval(timer);
-                        document.getElementById('countdown').innerHTML = "🚀 LAUNCHED!";
-                    }
-                }, 1000);
-            </script>
-        </body>
-        </html>
-    `;
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const htmlContent = response.text();
-    return htmlContent;
-  } catch (error) {
-        console.error("Gemini API Error:", error);
-        return null;
-  }
-}
+      const response = await fetch(AI_API_ENDPOINT, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${AI_API_KEY}` // If your API requires authorization
+          },
+          body: JSON.stringify({
+              prompt: `Generate a high-quality, Tailwind CSS based meme coin landing page similar to test1.html, but tailored to these details: ${JSON.stringify(formData)}.  
+                       The landing page should be visually appealing, persuasive, and mobile-responsive. Use the logo URL if provided, and the background color or image if provided. Focus on a clean, modern design. The generated output must be complete HTML page.`,
+              // You can add more parameters based on your API's requirements, like model, temperature, max_tokens, etc.
+          }),
+      });
 
-async function saveHTMLToStorage(htmlContent, documentId) {
-    const storageRef = storage.ref();
-     const htmlFileRef = storageRef.child(`memePages/${documentId}.html`); // Use documentId to name HTML file.
-     try {
-        await htmlFileRef.putString(htmlContent, 'text/html');
-        console.log("HTML saved to Firebase Storage")
-     } catch (error) {
-       console.error("Error saving html file to firebase", error);
-     }
+      if (!response.ok) {
+          console.error("AI API Error:", response.status, await response.text());
+          return null;
+      }
+
+      const data = await response.json();
+
+      // Assuming the AI returns the HTML in a field called "html" or "content"
+      const generatedHTML = data.html || data.content;
+      return generatedHTML;
+
+  } catch (error) {
+      console.error("Error calling AI API:", error);
+      return null;
+  }
 }
